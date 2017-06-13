@@ -1,0 +1,65 @@
+<a href="/board/index">홈</a>
+<%= @board.title %></br>
+<%= @board.user.email%></br>
+<%= @board.contente%></br>
+<%= @board.created_at%></br>
+
+<% if current_user != nil %>
+    <% if @board.user.email == current_user.email %>
+        <input type="button" value="수정" onclick="getValue();" class="btn btn-outline-danger"/>   
+        <input type="button" value="삭제" onclick="getValue2();" class="btn btn-outline-danger"/> 
+    <% end %>
+<% end %>
+<br>
+
+<input type="hidden" id="password" value="<%= @board.password %>"/>   
+<input type="hidden" id="board_id" value="<%= @board.id %>"/> 
+
+
+
+  <%= hidden_field_tag(:board_id, @board.id) %>
+  <%= label_tag(:content, "댓글") %>
+  <%= text_field_tag(:content) %>
+  <%= submit_tag("댓글작성",id:"submit") %>
+  <br>
+<div class="comment_div">
+    <% @comments.each do |c| %>
+        <%= c.content%></br>
+    <% end %>
+</div>
+<script type="text/javascript">                   
+    function getValue(){           
+        var password = document.getElementById('password').value;          
+        var board_id = document.getElementById('board_id').value;        
+                
+        location.href="/board/"+board_id+"/edit";     
+                
+    }          
+    function getValue2(){         
+        var password = document.getElementById('password').value;   
+        var board_id = document.getElementById('board_id').value;  
+                       
+        location.href="/board/"+board_id+"/delete";   
+        
+    }
+    $("#submit").click(function(){
+        content = $("#content").val();
+        board_id = $("#board_id").val();
+        $.ajax({
+          method: "POST",
+          url: "/board/aws",
+          data: {content: content ,board_id: board_id },
+          success: function(){ 
+            $( ".comment_div" ).prepend( content+"<br>" );
+            $("#content").val("");
+          },
+          error: function(){
+            alert('error!');
+          }
+        })
+          
+    });
+    
+</script>
+
+
